@@ -1,0 +1,43 @@
+﻿<!DOCTYPE html>
+<html lang="de" class="">
+	<head>
+		<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" charset='utf-8' />
+		<title>SolarWeather - Main menu</title>
+		<script src="JavaScript.js"></script>
+		<link rel="stylesheet" type="text/css" href="Style.css">
+	</head>
+	<body onload='loadMainInfo()'>
+		<div style='text-align:left;display:inline-block;min-width:340px;'>
+			<div style='text-align:center;'>
+				<h1>SolarWeather</h1>
+			</div>
+			<div id='info' name='info'>
+			</div>
+			<br />
+			<form action='Settings.html' method='get'>
+				<button>Settings</button>
+			</form>
+			<br />
+			<form action='Infos.html' method='get'>
+				<button>Information</button>
+			</form>
+			<br />
+			<form action='Update.html' method='get' onsubmit='return confirm("Do you really want to start OTA?");'>
+				<button>Firmware Update</button>
+			</form>
+			<br />
+			<form action='Console.html' method='get'>
+				<button>Console</button>
+			</form>
+			<br />
+			<form action='Restart.html' method='get' onsubmit='return confirm("Really restart?");'>
+				<button class='button bred'>Restart</button>
+			</form>
+			<br />
+			<div style='text-align:right;font-size:11px;'>
+				<hr />
+				<a href='https://de.wikipedia.org/wiki/Die_Schlümpfe' target='_blank' style='color:#aaa;'>Bastellschlumpf SolarWeather Version 1.0</a>
+			</div>
+	</div>
+	</body>
+</html>

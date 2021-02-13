@@ -31,7 +31,7 @@
    This program is licensed under GPL-3.0
 
 ### Source Code
-  The software is the same as Snorktracker with #undef SIM808_CONNECTED 
+-  The software is the similar to Snorktracker
 
 ### Shopping list
 Here are some sample shopping items. Please check the details if everything is correct.
