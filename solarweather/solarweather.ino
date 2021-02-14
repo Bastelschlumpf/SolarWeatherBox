@@ -43,7 +43,7 @@
 
 
 #define     PIN_BME_GRND  D4                                        //!< Ground pin to the BME280 module
-#define     BME_ADDRESS   0x77                                      //!< BME280 port address (Default 0x77, China 0x76)
+#define     BME_ADDRESS   0x76                                      //!< BME280 port address (Default 0x77, China 0x76)
 #define     PIN_TX        D5                                        //!< Transmit-pin to the sim808 RX
 #define     PIN_RX        D6                                        //!< Receive-pin to the sim808 TX
                                                                  
