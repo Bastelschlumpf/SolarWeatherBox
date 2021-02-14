@@ -20,7 +20,7 @@
   * Class to read the power supply voltage.
   */
 
-#define ANALOG_FACTOR 0.03 //!< Factor to the analog voltage divider
+#define ANALOG_FACTOR 0.031 //!< Factor to the analog voltage divider
 
 /**
   * Voltage Reader. Works with the voltage divider resistors and the analog input reader.
