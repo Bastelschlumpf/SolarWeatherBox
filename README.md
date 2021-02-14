@@ -2,19 +2,19 @@
 ## SolarWeatherBox
   **Iot Weather sensor with solar power and sending the data to an MQTT server.***
 
+   ![SolarPanel](images/SolarPanel.jpg "SolarPanel")
+
    ![SolarWeatherBox](images/Back.jpg "SolarWeatherBox")
+
+   ![SolarWeatherBox](images/BoxInternal.jpg "BoxInternal")
 
    ![SolarWeatherBox](images/Box.jpg "Box")
 
    ![SolarWeatherBox](images/Box2.jpg "Box2")
 
-   ![SolarWeatherBox](images/BoxInternal.jpg "BoxInternal")
-
    ![SolarWeatherBox](images/Circuit.jpg "Circuit")
 
    ![SolarWeatherBox](images/CircuitBack.jpg "CircuitBack")
-
-   ![SolarPanel](images/SolarPanel.jpg "SolarPanel")
 
    ![Housing](housing/SolarWeatherBox.png "Housing")
 
