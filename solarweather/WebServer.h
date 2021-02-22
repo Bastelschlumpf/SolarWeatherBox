@@ -393,11 +393,10 @@ void MyWebServer::handleLoadMainInfo()
    AddTableTr(info, F("Temperature"),     String(myData->temperature, 1) + F(" °C"));
    AddTableTr(info, F("Humidity"),        String(myData->humidity,    1) + F(" %"));
    AddTableTr(info, F("Pressure"),        String(myData->pressure,    1) + F(" hPa"));
-   AddTableTr(info, F("Active Time"),     formatInterval(myData->getActiveTimeSec()));
-   AddTableTr(info, F("PowerUpTime"),     formatInterval(myData->getPowerOnTimeSec()));
-   AddTableTr(info, F("DeepSleepTime"),   formatInterval(myData->rtcData.deepSleepTimeSec));
+   AddTableTr(info, F("Power up time"),   formatInterval(myData->getActiveTimeSec()));
+   AddTableTr(info, F("Active time"),     formatInterval(myData->getActiveTimeSumSec()));
+   AddTableTr(info, F("Deep sleep time"), formatInterval(myData->getDeepSleepTimeSumSec()));
    AddTableTr(info, F("mAh"),             String(myData->getPowerConsumption(), 2));
-   AddTableTr(info, F("Low power mAh"),   String(myData->getLowPowerPowerConsumption(), 2));
 
    if (myOptions->isMqttEnabled) {
       AddTableTr(info, F("MQTT sent"), String(myData->rtcData.mqttSendCount));
@@ -536,7 +535,7 @@ void MyWebServer::handleSaveSettings()
    // Reset the rtc data if something has changed.
    myData->awakeTimeOffsetSec = millis() / 1000;
    // Reset the last mqtt time so the mqtt is not direct starting afer save settings.
-   myData->rtcData.lastMqttPublishSec = secondsSincePowerOn();
+   myData->rtcData.lastMqttPublishSec = myData->getActiveTimeSec();
    myOptions->save();
 
    if (false /* reboot */) {

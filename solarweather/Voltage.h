@@ -66,21 +66,6 @@ bool MyVoltage::begin()
   */
 void MyVoltage::readVoltage()
 {
-   bool isLowPower = false;
-   long currSec    = millis() / 1000;
-   
-   myData.voltage = ANALOG_FACTOR * analogRead(A0); // Volt
-   isLowPower     = myData.voltage < myOptions.powerSaveModeVoltage;
-
-   if (myData.isLowPower && !isLowPower) { // Change to high power
-      long lowPowerSec = currSec - lowPowerStartSec;
-
-      myData.rtcData.lowPowerActiveTimeSec += lowPowerSec;
-      MyDbg((String) F("Change to high power (V): ") + String(myData.voltage, 2));
-   }
-   if (!myData.isLowPower && isLowPower) { // Change to low power
-      lowPowerStartSec = currSec;
-      MyDbg((String) F("Change to low power (V): ") + String(myData.voltage, 2));
-   }
-   myData.isLowPower = isLowPower;
+   myData.voltage    = ANALOG_FACTOR * analogRead(A0); // Volt
+   myData.isLowPower = myData.voltage < myOptions.powerSaveModeVoltage; 
 }

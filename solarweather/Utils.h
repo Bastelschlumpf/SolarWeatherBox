@@ -46,12 +46,12 @@ public:
 };
 
 /** This function has to be overwritten to return the seconds since power up (not since last deep sleep). */
-long secondsSincePowerOn();
+long getActiveTimeSec();
 
 /** Checks if the intervalSec is from the last checkIntervalSec elapsed */
 bool secondsElapsed(long &lastCheckSec, const long &intervalSec)
 {
-   long currentSec = secondsSincePowerOn();
+   long currentSec = getActiveTimeSec();
 
    if (lastCheckSec == 0 || (currentSec - lastCheckSec > intervalSec)) {
       return true;
@@ -62,7 +62,7 @@ bool secondsElapsed(long &lastCheckSec, const long &intervalSec)
 /** Checks if the intervalSec is from the last checkIntervalSec elapsed and if true it sets the lastCheckSec value */
 bool secondsElapsedAndUpdate(long &lastCheckSec, const long &intervalSec)
 {
-   long currentSec = secondsSincePowerOn();
+   long currentSec = getActiveTimeSec();
 
    if (lastCheckSec == 0 || (currentSec - lastCheckSec > intervalSec)) {
       lastCheckSec = currentSec;

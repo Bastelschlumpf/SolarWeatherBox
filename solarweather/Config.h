@@ -34,4 +34,4 @@
 #define MQTT_PASSWORD "password"               //!< MQTT connection password
 
 #define POWER_CONSUMPTION_ACTIVE       70.0    //!< Power consumption if Active in mA
-#define POWER_CONSUMPTION_DEEP_SLEEP    0.407  //!< Power consumption if in deep sleep mode in mA
+#define POWER_CONSUMPTION_DEEP_SLEEP    0.5    //!< Power consumption if in deep sleep mode in mA

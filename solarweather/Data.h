@@ -32,18 +32,16 @@ public:
      */
    class RtcData {
    public:
-      long aktiveTimeSec;          //!< Time in active mode without current millis().
-      long powerOnTimeSec;         //!< Time the sim808 is on power without current millis..
-      long deepSleepTimeSec;       //!< Time in deep sleep mode. 
+      long activeTimeSumSec;       //!< Time on power with current millis..
+      long deepSleepTimeSumSec;    //!< Time in deep sleep mode. 
       long deepSleepStartSec;      //!< Timestamp of the last deep sleep start.
                  
-      long lowPowerActiveTimeSec;  //!< Timestamp of the last deep sleep start.
-      long lowPowerPowerOnTimeSec; //!< Timestamp of the last deep sleep start.
-
       long lastBme280ReadSec;      //!< Timestamp of the last BME280 read.
       long lastMqttPublishSec;     //!< Timestamp from the last send.
 
+      long mqttConnErrorCount;     //!< How many time the mqtt connection to the server fails.
       long mqttSendCount;          //!< How many time the mqtt data successfully sent.
+      long mqttSendErrorCount;     //!< How many time the mqtt sending failed.
                  
       long crcValue;               //!< CRC of the RtcData
 
@@ -82,28 +80,24 @@ public:
 public:
    MyData();
 
-   long   secondsSincePowerOn();
    long   getActiveTimeSec();
-   long   getLowPowerActiveTimeSec();
-   long   getPowerOnTimeSec();
-   long   getLowPowerPowerOnTimeSec();
+   long   getActiveTimeSumSec();
+   long   getDeepSleepTimeSumSec();
 
    double getPowerConsumption();
-   double getLowPowerPowerConsumption();
 };
 
 /* ******************************************** */
 
 MyData::RtcData::RtcData()
-   : aktiveTimeSec(0)
-   , powerOnTimeSec(0)
-   , deepSleepTimeSec(0)
+   : activeTimeSumSec(0)
+   , deepSleepTimeSumSec(0)
    , deepSleepStartSec(0)
-   , lowPowerActiveTimeSec(0)
-   , lowPowerPowerOnTimeSec(0)
    , lastBme280ReadSec(0)
    , lastMqttPublishSec(0)
+   , mqttConnErrorCount(0)
    , mqttSendCount(0)
+   , mqttSendErrorCount(0)
 {
    crcValue = getCRC();
 }
@@ -125,15 +119,14 @@ long MyData::RtcData::getCRC()
 {
    long crc = 0;
 
-   crc = crc32(crc, (unsigned char *) &aktiveTimeSec,          sizeof(long));
-   crc = crc32(crc, (unsigned char *) &powerOnTimeSec,         sizeof(long));
-   crc = crc32(crc, (unsigned char *) &deepSleepTimeSec,       sizeof(long));
-   crc = crc32(crc, (unsigned char *) &deepSleepStartSec,      sizeof(long));
-   crc = crc32(crc, (unsigned char *) &lowPowerActiveTimeSec,  sizeof(long));
-   crc = crc32(crc, (unsigned char *) &lowPowerPowerOnTimeSec, sizeof(long));
-   crc = crc32(crc, (unsigned char *) &lastBme280ReadSec,      sizeof(long));
-   crc = crc32(crc, (unsigned char *) &lastMqttPublishSec,     sizeof(long));
-   crc = crc32(crc, (unsigned char *) &mqttSendCount,          sizeof(long));
+   crc = crc32(crc, (unsigned char *) &activeTimeSumSec,    sizeof(long));
+   crc = crc32(crc, (unsigned char *) &deepSleepTimeSumSec, sizeof(long));
+   crc = crc32(crc, (unsigned char *) &deepSleepStartSec,   sizeof(long));
+   crc = crc32(crc, (unsigned char *) &lastBme280ReadSec,   sizeof(long));
+   crc = crc32(crc, (unsigned char *) &lastMqttPublishSec,  sizeof(long));
+   crc = crc32(crc, (unsigned char *) &mqttConnErrorCount,  sizeof(long));
+   crc = crc32(crc, (unsigned char *) &mqttSendCount,       sizeof(long));
+   crc = crc32(crc, (unsigned char *) &mqttConnErrorCount,  sizeof(long));
    
    return crc;
 }
@@ -152,41 +145,21 @@ MyData::MyData()
 }
 
 /** Returns the seconds since power up (not since last deep sleep). */
-long MyData::secondsSincePowerOn()
-{
-   return rtcData.deepSleepTimeSec + getActiveTimeSec();
-}
-
-/** Return all the active over all deep sleeps plus the current active time. */
 long MyData::getActiveTimeSec()
 {
-   return rtcData.aktiveTimeSec + millis() / 1000;
+   return millis() / 1000;
 }
 
 /** Return all the active over all deep sleeps plus the current active time. */
-long MyData::getLowPowerActiveTimeSec()
+long MyData::getActiveTimeSumSec()
 {
-   if (!isLowPower) {
-      return rtcData.lowPowerActiveTimeSec;
-   } else {
-      return rtcData.lowPowerActiveTimeSec + millis() / 1000;
-   }
+   return rtcData.activeTimeSumSec + getActiveTimeSec();
 }
 
-/** Returns the power on time over all deep sleeps plus the current active time if power is on. */
-long MyData::getPowerOnTimeSec()
+/** Return all the deep sleep time. */
+long MyData::getDeepSleepTimeSumSec()
 {
-   return rtcData.powerOnTimeSec + millis() / 1000;
-}
-
-/** Return all the time with power on on low power supply. */
-long MyData::getLowPowerPowerOnTimeSec()
-{
-   if (!isLowPower) {
-      return rtcData.lowPowerPowerOnTimeSec;
-   } else {
-      return rtcData.lowPowerPowerOnTimeSec + millis() / 1000;
-   }
+   return rtcData.deepSleepTimeSumSec;
 }
 
 /** Calculates the power consumption from power on.
@@ -194,15 +167,6 @@ long MyData::getLowPowerPowerOnTimeSec()
   */
 double MyData::getPowerConsumption()
 {
-   return (POWER_CONSUMPTION_ACTIVE     * (getActiveTimeSec() - getPowerOnTimeSec()) +
-           POWER_CONSUMPTION_DEEP_SLEEP * rtcData.deepSleepTimeSec) / 3600.0;
-}
-
-/** Calculates the power consumption on low power from power on.
-  * In mA/h
-  */
-double MyData::getLowPowerPowerConsumption()
-{
-   return (POWER_CONSUMPTION_ACTIVE     * (getLowPowerActiveTimeSec() - getLowPowerPowerOnTimeSec()) +
-           POWER_CONSUMPTION_DEEP_SLEEP * rtcData.deepSleepTimeSec) / 3600.0;
+   return (POWER_CONSUMPTION_ACTIVE     * getActiveTimeSumSec() +
+           POWER_CONSUMPTION_DEEP_SLEEP * getDeepSleepTimeSumSec()) / 3600.0;
 }

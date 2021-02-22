@@ -44,8 +44,6 @@
 
 #define     PIN_BME_GRND  D4                                        //!< Ground pin to the BME280 module
 #define     BME_ADDRESS   0x76                                      //!< BME280 port address (Default 0x77, China 0x76)
-#define     PIN_TX        D5                                        //!< Transmit-pin to the sim808 RX
-#define     PIN_RX        D6                                        //!< Receive-pin to the sim808 TX
                                                                  
 MyOptions   myOptions;                                              //!< The global options.
 MyData      myData;                                                 //!< The global collected data.
@@ -71,6 +69,12 @@ void yield(void)
    ESP.wdtFeed();
 }*/
 
+/** Returns the seconds since power up (not since last deep sleep). */
+long getActiveTimeSec()
+{
+   return myData.getActiveTimeSec();
+}
+
 /** Overwritten Debug Function 
   * It logs all the debug calls to the console string-list
   * And call a refresh of the webserver for not blocking the system.
@@ -80,7 +84,7 @@ void myDebugInfo(String info, bool fromWebserver, bool newline)
    static bool lastNewLine = true;
    
    if (newline || lastNewLine != newline) {
-      String secs = String(secondsSincePowerOn()) + F(": ");
+      String secs = String(myData.getActiveTimeSec()) + F(": ");
 
       myData.logInfos.addTail(secs + info);
       if (!lastNewLine) {
@@ -112,12 +116,6 @@ void myDelayLoop()
    myWebServer.handleClient(); 
    delay(1);
    yield();
-}
-
-/** Returns the seconds since power up (not since last deep sleep). */
-long secondsSincePowerOn()
-{
-   return myData.secondsSincePowerOn();
 }
 
 /** Main setup function. This is also called after every deep sleep. 

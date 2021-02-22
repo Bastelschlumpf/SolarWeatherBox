@@ -23,19 +23,20 @@
 
 #include <PubSubClient.h>
 
-#define topic_deep_sleep             "/DeepSleep"              //!< Deep sleep on/off
+#define topic_deep_sleep       "/DeepSleep"          //!< Deep sleep on/off
+#define topic_send_every       "/SendEverySec"       //!< mqtt sending interval
 
-#define topic_voltage                "/Voltage"                //!< Power supply voltage
-#define topic_mAh                    "/mAh"                    //!< Power consumption
-#define topic_mAhLowPower            "/mAhLowPower"            //!< Power consumption in low power
-#define topic_alive                  "/Alive"                  //!< Alive time in sec
-#define topic_rssi                   "/RSSI"                   //!< Wifi conection quality
+#define topic_temperature      "/BME280/Temperature" //!< Temperature
+#define topic_humidity         "/BME280/Humidity"    //!< Humidity
+#define topic_pressure         "/BME280/Pressure"    //!< Pressure
 
-#define topic_send_every             "/SendEverySec"           //!< mqtt sending interval
+#define topic_voltage          "/Voltage"            //!< Power supply voltage
+#define topic_mAh              "/mAh"                //!< Power consumption
+#define topic_alive            "/Alive"              //!< Alive time in sec
+#define topic_rssi             "/RSSI"               //!< Wifi conection quality
 
-#define topic_temperature            "/BME280/Temperature"     //!< Temperature
-#define topic_humidity               "/BME280/Humidity"        //!< Humidity
-#define topic_pressure               "/BME280/Pressure"        //!< Pressure
+#define topic_conn_error_count "/ConnErrorCount"     //!< Connection error Count
+#define topic_send_error_count "/SendErrorCount"     //!< mqtt sending error count
 
 /**
   * MQTT client for sending the collected data to a MQTT server
@@ -108,6 +109,7 @@ bool MyMqtt::myPublish(String subTopic, String value)
       topic = myOptions.mqttName + F("/") + myOptions.mqttId + subTopic;
       MyDbg((String) F("MyMqtt::publish: [") + topic + F("]=[") + value + F("]"), true);
       ret = PubSubClient::publish(topic.c_str(), value.c_str(), true);
+      if (!ret) myData.rtcData.mqttSendErrorCount++;
    }
    return ret;
 }
@@ -138,34 +140,38 @@ void MyMqtt::handleClient()
    if (send && !publishInProgress) {
       publishInProgress = true;
       if (!PubSubClient::connected()) {
-         for (int i = 0; !PubSubClient::connected() && i < 5; i++) {  
+         for (int i = 0; !PubSubClient::connected() && i < 25; i++) {  
             MyDbg((String) "Attempting MQTT connection..." + " [" + myOptions.mqttName + "][" + myOptions.mqttUser + "][" + myOptions.mqttPassword + "]", true);
             if (PubSubClient::connect(myOptions.mqttName.c_str(), myOptions.mqttUser.c_str(), myOptions.mqttPassword.c_str())) {  
                // mySubscribe(topic_deep_sleep);
                MyDbg(F(" connected"), true);
             } else {  
                MyDbg((String) F("   Mqtt failed, rc = ") + String(PubSubClient::state()), true);
-               MyDbg(F(" Try again in 5 seconds"), true);
-               MyDelay(5000);
+               MyDbg(F(" Try again in 1 second"), true);
+               MyDelay(1000);
                MyDbg(F("."), true, false);
             }  
          }  
       }
-      if (PubSubClient::connected()) {
+      if (!PubSubClient::connected()) {
+         myData.rtcData.mqttConnErrorCount++;
+      } else {
          MyDbg(F("Attempting MQTT publishing"), true);
-         myPublish(topic_voltage,     String(myData.voltage, 2));
-         myPublish(topic_mAh,         String(myData.getPowerConsumption()));
-         myPublish(topic_mAhLowPower, String(myData.getLowPowerPowerConsumption()));
-         myPublish(topic_alive,       formatInterval(myData.getActiveTimeSec()));
-         myPublish(topic_temperature, String(myData.temperature));
-         myPublish(topic_humidity,    String(myData.humidity));
-         myPublish(topic_pressure,    String(myData.pressure));
+         myPublish(topic_temperature,      String(myData.temperature));
+         myPublish(topic_humidity,         String(myData.humidity));
+         myPublish(topic_pressure,         String(myData.pressure));
+         myPublish(topic_voltage,          String(myData.voltage, 2));
+         myPublish(topic_mAh,              String(myData.getPowerConsumption()));
+         myPublish(topic_alive,            formatInterval(myData.getActiveTimeSec()));
+         myPublish(topic_rssi,             String(WiFi.RSSI()));
+         myPublish(topic_conn_error_count, String(myData.rtcData.mqttConnErrorCount));
+         myPublish(topic_send_error_count, String(myData.rtcData.mqttSendErrorCount));
          myData.rtcData.mqttSendCount++;
          MyDbg(F("mqtt published"), true);
          MyDelay(5000);
       }
       // Set time even on error
-      myData.rtcData.lastMqttPublishSec = secondsSincePowerOn();
+      myData.rtcData.lastMqttPublishSec = myData.getActiveTimeSec();
       publishInProgress = false;
    }
 }

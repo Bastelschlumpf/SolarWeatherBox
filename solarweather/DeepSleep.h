@@ -70,9 +70,9 @@ bool MyDeepSleep::begin()
       myData.rtcData = rtcData;
    }
 
-   if (myOptions.isDeepSleepEnabled && secondsSincePowerOn() > NO_DEEP_SLEEP_STARTUP_TIME) {
+   if (myOptions.isDeepSleepEnabled && myData.getActiveTimeSec() > NO_DEEP_SLEEP_STARTUP_TIME) {
       if (myData.voltage < myOptions.powerSaveModeVoltage) {
-         long checkTimeElapsed = secondsSincePowerOn() - myData.rtcData.deepSleepStartSec;
+         long checkTimeElapsed = myData.getActiveTimeSec() - myData.rtcData.deepSleepStartSec;
 
          // Check from time to time the power and return to deep sleep if the 
          // power is too low until the deep sleep time is over.
@@ -93,11 +93,11 @@ bool MyDeepSleep::haveToSleep()
 
    myData.secondsToDeepSleep = -1;
    if (myOptions.isDeepSleepEnabled && myData.voltage < myOptions.powerSaveModeVoltage) {
-      myData.secondsToDeepSleep = max(myOptions.activeTimeSec - activeTimeSec, NO_DEEP_SLEEP_STARTUP_TIME - secondsSincePowerOn());
+      myData.secondsToDeepSleep = max(myOptions.activeTimeSec - activeTimeSec, NO_DEEP_SLEEP_STARTUP_TIME - myData.getActiveTimeSec());
    }
 
    return (myOptions.isDeepSleepEnabled && 
-           secondsSincePowerOn() > NO_DEEP_SLEEP_STARTUP_TIME &&
+           myData.getActiveTimeSec() > NO_DEEP_SLEEP_STARTUP_TIME &&
            myData.voltage        <  myOptions.powerSaveModeVoltage && 
            activeTimeSec         >= myOptions.activeTimeSec);
 }
@@ -115,10 +115,10 @@ void MyDeepSleep::sleep(bool start /* = true */)
    delay(1000);
 
    if (start) {
-      myData.rtcData.deepSleepStartSec = secondsSincePowerOn();
+      myData.rtcData.deepSleepStartSec = myData.getActiveTimeSumSec();
    }
-   myData.rtcData.aktiveTimeSec    += millis() / 1000;
-   myData.rtcData.deepSleepTimeSec += powerCheckIntervalSec;
+   myData.rtcData.activeTimeSumSec    += myData.getActiveTimeSumSec();
+   myData.rtcData.deepSleepTimeSumSec += powerCheckIntervalSec;
    myData.rtcData.setCRC();
    ESP.rtcUserMemoryWrite(0, (uint32_t *) &myData.rtcData, sizeof(MyData::RtcData));
    ESP.deepSleep(powerCheckIntervalSec * 1000000);
