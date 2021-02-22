@@ -46,19 +46,19 @@ public:
 };
 
 /** Checks if the intervalSec is from the last checkIntervalSec elapsed */
-bool secondsElapsed(long activeTimeSumSec, long &lastCheckSec, const long &intervalSec)
+bool secondsElapsed(long allTimeSumSec, long &lastCheckSec, const long &intervalSec)
 {
-   if (lastCheckSec == 0 || (activeTimeSumSec - lastCheckSec > intervalSec)) {
+   if (lastCheckSec == 0 || (allTimeSumSec - lastCheckSec > intervalSec)) {
       return true;
    }
    return false;
 }
 
 /** Checks if the intervalSec is from the last checkIntervalSec elapsed and if true it sets the lastCheckSec value */
-bool secondsElapsedAndUpdate(long activeTimeSumSec, long &lastCheckSec, const long &intervalSec)
+bool secondsElapsedAndUpdate(long allTimeSumSec, long &lastCheckSec, const long &intervalSec)
 {
-   if (lastCheckSec == 0 || (activeTimeSumSec - lastCheckSec > intervalSec)) {
-      lastCheckSec = activeTimeSumSec;
+   if (lastCheckSec == 0 || (allTimeSumSec - lastCheckSec > intervalSec)) {
+      lastCheckSec = allTimeSumSec;
       return true;
    }
    return false;

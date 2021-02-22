@@ -80,6 +80,7 @@ public:
    MyData();
 
    long   getActiveTimeSec();
+   long   getAllTimeSumSec();
    long   getActiveTimeSumSec();
    long   getDeepSleepTimeSumSec();
 
@@ -146,6 +147,12 @@ MyData::MyData()
 long MyData::getActiveTimeSec()
 {
    return millis() / 1000;
+}
+
+/** Return all the active and deep sleep time plus the current active time. */
+long MyData::getAllTimeSumSec()
+{
+   return getActiveTimeSumSec() + getDeepSleepTimeSumSec();
 }
 
 /** Return all the active over all deep sleeps plus the current active time. */

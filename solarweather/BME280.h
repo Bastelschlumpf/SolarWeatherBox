@@ -70,8 +70,10 @@ bool MyBME280::begin()
    
    if (bme280.begin(0x77)) { // Default 0x77
       portAddr = 0x77;
+      MyDbg("BME280 sensor with port 0x77!");
    } else if (bme280.begin(0x76)) { // China 0x76
       portAddr = 0x76;
+      MyDbg("BME280 sensor with port 0x76!");
    }
 }
 
@@ -81,7 +83,7 @@ bool MyBME280::begin()
   */
 bool MyBME280::readValues()
 {
-   if (secondsElapsedAndUpdate(myData.getActiveTimeSumSec(), myData.rtcData.lastBme280ReadSec, myOptions.bme280CheckIntervalSec)) {
+   if (secondsElapsedAndUpdate(myData.getAllTimeSumSec(), myData.rtcData.lastBme280ReadSec, myOptions.bme280CheckIntervalSec)) {
       digitalWrite(pinGrnd, LOW);
       delay(100); // Short delay after power on
       if (!bme280.begin(portAddr)) {

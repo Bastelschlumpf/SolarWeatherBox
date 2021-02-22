@@ -120,7 +120,7 @@ bool MyMqtt::waitingForMqtt()
    if (publishInProgress) {
       return true;
    }
-   return secondsElapsed(myData.getActiveTimeSumSec(), myData.rtcData.lastMqttPublishSec, myOptions.mqttSendEverySec);
+   return secondsElapsed(myData.getAllTimeSumSec(), myData.rtcData.lastMqttPublishSec, myOptions.mqttSendEverySec);
 }
 
 /** Sets the MQTT server settings */
@@ -136,8 +136,8 @@ bool MyMqtt::begin()
 /** Connect To the MQTT server and send the data when the time is right. */
 void MyMqtt::handleClient()
 {
-   bool send = secondsElapsed(myData.getActiveTimeSumSec(), myData.rtcData.lastMqttPublishSec, myOptions.mqttSendEverySec);
-   
+   bool send = secondsElapsed(myData.getAllTimeSumSec(), myData.rtcData.lastMqttPublishSec, myOptions.mqttSendEverySec);
+
    if (send && !publishInProgress) {
       publishInProgress = true;
       if (!PubSubClient::connected()) {
@@ -172,7 +172,7 @@ void MyMqtt::handleClient()
          MyDelay(5000);
       }
       // Set time even on error
-      myData.rtcData.lastMqttPublishSec = myData.getActiveTimeSumSec();
+      myData.rtcData.lastMqttPublishSec = myData.getAllTimeSumSec();
       publishInProgress = false;
    }
 }

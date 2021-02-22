@@ -20,7 +20,7 @@
   * DeepSleep functions.
   */
 
-#define NO_DEEP_SLEEP_STARTUP_TIME 120 //!< No deep sleep for the first minute.
+#define NO_DEEP_SLEEP_STARTUP_TIME 120 //!< No deep sleep for the first two minutes.
 
 
 /**
@@ -79,7 +79,7 @@ bool MyDeepSleep::haveToSleep()
 
    myData.secondsToDeepSleep = -1;
    if (myOptions.isDeepSleepEnabled) {
-      myData.secondsToDeepSleep = max(myOptions.activeTimeSec - activeTimeSec, NO_DEEP_SLEEP_STARTUP_TIME - myData.getActiveTimeSec());
+      myData.secondsToDeepSleep = max(myOptions.activeTimeSec - activeTimeSec, NO_DEEP_SLEEP_STARTUP_TIME - myData.getActiveTimeSumSec());
    }
 
    return (myOptions.isDeepSleepEnabled && 
