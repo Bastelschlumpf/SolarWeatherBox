@@ -36,8 +36,6 @@ public:
    bool   isDebugActive;             //!< Is detailed debugging enabled?
    long   bme280CheckIntervalSec;    //!< Time interval to read the temp, hum and pressure.
    bool   isDeepSleepEnabled;        //!< Should the system go into deepsleep if needed.
-   double powerSaveModeVoltage;      //!< Minimum voltage to stay always alive.
-   long   powerCheckIntervalSec;     //!< Time interval to check the power supply.
    long   activeTimeSec;             //!< Maximum alive time after deepsleep.
    long   deepSleepTimeSec;          //!< Time to stay in deep sleep (without check interrupts)
    bool   isMqttEnabled;             //!< Should the system connect to a MQTT server?
@@ -65,8 +63,6 @@ MyOptions::MyOptions()
    , wifiPassword(WIFI_PW)
    , bme280CheckIntervalSec(60) // 1 Min
    , isDeepSleepEnabled(false)
-   , powerSaveModeVoltage(16.0)
-   , powerCheckIntervalSec(300) //  5 Min
    , activeTimeSec(60)          //  1 Min
    , deepSleepTimeSec(900)      // 15 Min
    , isMqttEnabled(false)
@@ -119,10 +115,6 @@ bool MyOptions::load()
                bme280CheckIntervalSec = lValue;
             } else if (key == F("isDeepSleepEnabled")) {
                isDeepSleepEnabled = lValue;
-            } else if (key == F("powerSaveModeVoltage")) {
-               powerSaveModeVoltage = fValue;
-            } else if (key == F("powerCheckIntervalSec")) {
-               powerCheckIntervalSec = lValue;
             } else if (key == F("activeTimeSec")) {
                activeTimeSec = lValue;
             } else if (key == F("deepSleepTimeSec")) {
@@ -165,24 +157,22 @@ bool MyOptions::save()
   if (!file) {
      MyDbg("Failed to write options file");
   } else {
-     file.println((String) F("isDebugActive=")             + String(isDebugActive));
-     file.println((String) F("connectWifiAP=")             + String(connectWifiAP));
-     file.println((String) F("wifiAP=")                    + wifiAP);
-     file.println((String) F("wifiPassword=")              + wifiPassword);
-     file.println((String) F("bme280CheckIntervalSec=")    + String(bme280CheckIntervalSec));
-     file.println((String) F("isDeepSleepEnabled=")        + String(isDeepSleepEnabled));
-     file.println((String) F("powerSaveModeVoltage=")      + String(powerSaveModeVoltage, 2));
-     file.println((String) F("powerCheckIntervalSec=")     + String(powerCheckIntervalSec));
-     file.println((String) F("activeTimeSec=")             + String(activeTimeSec));
-     file.println((String) F("deepSleepTimeSec=")          + String(deepSleepTimeSec));
-     file.println((String) F("isMqttEnabled=")             + String(isMqttEnabled));
-     file.println((String) F("mqttName=")                  + mqttName);
-     file.println((String) F("mqttId=")                    + mqttId);
-     file.println((String) F("mqttServer=")                + mqttServer);
-     file.println((String) F("mqttPort=")                  + String(mqttPort));
-     file.println((String) F("mqttUser=")                  + mqttUser);
-     file.println((String) F("mqttPassword=")              + mqttPassword);
-     file.println((String) F("mqttSendEverySec=")          + String(mqttSendEverySec));
+     file.println((String) F("isDebugActive=")          + String(isDebugActive));
+     file.println((String) F("connectWifiAP=")          + String(connectWifiAP));
+     file.println((String) F("wifiAP=")                 + wifiAP);
+     file.println((String) F("wifiPassword=")           + wifiPassword);
+     file.println((String) F("bme280CheckIntervalSec=") + String(bme280CheckIntervalSec));
+     file.println((String) F("isDeepSleepEnabled=")     + String(isDeepSleepEnabled));
+     file.println((String) F("activeTimeSec=")          + String(activeTimeSec));
+     file.println((String) F("deepSleepTimeSec=")       + String(deepSleepTimeSec));
+     file.println((String) F("isMqttEnabled=")          + String(isMqttEnabled));
+     file.println((String) F("mqttName=")               + mqttName);
+     file.println((String) F("mqttId=")                 + mqttId);
+     file.println((String) F("mqttServer=")             + mqttServer);
+     file.println((String) F("mqttPort=")               + String(mqttPort));
+     file.println((String) F("mqttUser=")               + mqttUser);
+     file.println((String) F("mqttPassword=")           + mqttPassword);
+     file.println((String) F("mqttSendEverySec=")       + String(mqttSendEverySec));
      file.close();
      MyDbg(F("Settings saved"));
      return true;

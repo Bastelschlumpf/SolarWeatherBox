@@ -42,20 +42,17 @@
 #include "BME280.h"
 
 
-#define     PIN_BME_GRND  D4                                        //!< Ground pin to the BME280 module
-#define     BME_ADDRESS   0x76                                      //!< BME280 port address (Default 0x77, China 0x76)
-                                                                 
-MyOptions   myOptions;                                              //!< The global options.
-MyData      myData;                                                 //!< The global collected data.
-MyVoltage   myVoltage(myOptions, myData);                           //!< Helper class for deep sleeps.
-MyDeepSleep myDeepSleep(myOptions, myData);                         //!< Helper class for deep sleeps.
-MyWebServer myWebServer(myOptions, myData);                         //!< The Webserver
-MyBME280    myBME280(myOptions, myData, PIN_BME_GRND, BME_ADDRESS); //!< Helper class for the BME280 sensor communication.
+MyOptions   myOptions;                       //!< The global options.
+MyData      myData;                          //!< The global collected data.
+MyVoltage   myVoltage   (myOptions, myData); //!< Helper class for deep sleeps.
+MyDeepSleep myDeepSleep (myOptions, myData); //!< Helper class for deep sleeps.
+MyWebServer myWebServer (myOptions, myData); //!< The Webserver
+MyBME280    myBME280    (myOptions, myData); //!< Helper class for the BME280 sensor communication.
 
 MyMqtt      myMqtt(MyWebServer::server.wifiClient(), myOptions, myData); 
 
-bool        isStarting  = false;                                    //!< Are we in a starting process?
-bool        isStopping  = false;                                    //!< Are we in a stopping process?
+bool        isStarting  = false;             //!< Are we in a starting process?
+bool        isStopping  = false;             //!< Are we in a stopping process?
 
 /**
  * ***** IMPORTANT *****
@@ -68,12 +65,6 @@ void yield(void)
 {
    ESP.wdtFeed();
 }*/
-
-/** Returns the seconds since power up (not since last deep sleep). */
-long getActiveTimeSec()
-{
-   return myData.getActiveTimeSec();
-}
 
 /** Overwritten Debug Function 
   * It logs all the debug calls to the console string-list

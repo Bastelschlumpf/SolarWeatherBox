@@ -69,20 +69,6 @@ bool MyDeepSleep::begin()
       MyDbg(F("RtcData read"));
       myData.rtcData = rtcData;
    }
-
-   if (myOptions.isDeepSleepEnabled && myData.getActiveTimeSec() > NO_DEEP_SLEEP_STARTUP_TIME) {
-      if (myData.voltage < myOptions.powerSaveModeVoltage) {
-         long checkTimeElapsed = myData.getActiveTimeSec() - myData.rtcData.deepSleepStartSec;
-
-         // Check from time to time the power and return to deep sleep if the 
-         // power is too low until the deep sleep time is over.
-         MyDbg((String) F("CheckTime elapsed: ") + String(checkTimeElapsed) + F(" sec"));
-         if (checkTimeElapsed < myOptions.deepSleepTimeSec) {
-            sleep(false); // back to sleep
-         }
-         MyDbg(F("Awake"));
-      }
-   }
    return true;
 }
 
@@ -92,34 +78,27 @@ bool MyDeepSleep::haveToSleep()
    long activeTimeSec = millis() / 1000 - myData.awakeTimeOffsetSec;
 
    myData.secondsToDeepSleep = -1;
-   if (myOptions.isDeepSleepEnabled && myData.voltage < myOptions.powerSaveModeVoltage) {
+   if (myOptions.isDeepSleepEnabled) {
       myData.secondsToDeepSleep = max(myOptions.activeTimeSec - activeTimeSec, NO_DEEP_SLEEP_STARTUP_TIME - myData.getActiveTimeSec());
    }
 
    return (myOptions.isDeepSleepEnabled && 
-           myData.getActiveTimeSec() > NO_DEEP_SLEEP_STARTUP_TIME &&
-           myData.voltage        <  myOptions.powerSaveModeVoltage && 
-           activeTimeSec         >= myOptions.activeTimeSec);
+           myData.getActiveTimeSumSec() > NO_DEEP_SLEEP_STARTUP_TIME &&
+           activeTimeSec                >= myOptions.activeTimeSec);
 }
 
 /** Entering the DeepSleep mode. Be sure we have connected the RST pin to the D0 pin for wakeup. */
 void MyDeepSleep::sleep(bool start /* = true */)
 {
-   long powerCheckIntervalSec = myOptions.powerCheckIntervalSec;
-
-   if (powerCheckIntervalSec > 60 * 60) {
-      MyDbg(F("Invalid DeepSleep time more than 60 Minutes!"));
-      powerCheckIntervalSec = 60 * 60;
-   }
-   MyDbg((String) F("Entering DeepSleep for: ") + String(myOptions.powerCheckIntervalSec) + F("Sec"));
+   MyDbg((String) F("Entering deep sleep for: ") + String(myOptions.deepSleepTimeSec) + F(" sec"));
    delay(1000);
 
    if (start) {
       myData.rtcData.deepSleepStartSec = myData.getActiveTimeSumSec();
    }
-   myData.rtcData.activeTimeSumSec    += myData.getActiveTimeSumSec();
-   myData.rtcData.deepSleepTimeSumSec += powerCheckIntervalSec;
+   myData.rtcData.activeTimeSumSec    += myData.getActiveTimeSec();
+   myData.rtcData.deepSleepTimeSumSec += myOptions.deepSleepTimeSec;
    myData.rtcData.setCRC();
    ESP.rtcUserMemoryWrite(0, (uint32_t *) &myData.rtcData, sizeof(MyData::RtcData));
-   ESP.deepSleep(powerCheckIntervalSec * 1000000);
+   ESP.deepSleep(myOptions.deepSleepTimeSec * 1000000);
 }

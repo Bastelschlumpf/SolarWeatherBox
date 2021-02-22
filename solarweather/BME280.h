@@ -23,8 +23,11 @@
 
 #include <Adafruit_BME280.h>
 
+#define PIN_BME_GRND      D4      //!< Ground pin to the BME280 module
+
 #define BARO_CORR_HPA     34.5879 //!< Correction for 289m above sea level
 #define TEMP_CORR_DEGREE  -2.0    //!< The BME280 measure 2 degrees too high 
+
 
 /**
   * Communication with the BME280 modul to read temperature, humidity and pressure
@@ -39,7 +42,7 @@ protected:
    Adafruit_BME280 bme280;       //!< Adafruit BME280 helper interface
    
 public:
-   MyBME280(MyOptions &options, MyData &data, int pin, uint8_t addr);
+   MyBME280(MyOptions &options, MyData &data, int pin = PIN_BME_GRND);
 
    bool begin();
 
@@ -49,11 +52,11 @@ public:
 /* ******************************************** */
 
 /** Constructor */
-MyBME280::MyBME280(MyOptions &options, MyData &data, int pin, uint8_t addr)
+MyBME280::MyBME280(MyOptions &options, MyData &data, int pin)
    : pinGrnd(pin)
    , myOptions(options)
    , myData(data)
-   , portAddr(addr)
+   , portAddr(0x77)
 {
 }
 
@@ -64,6 +67,12 @@ bool MyBME280::begin()
    pinMode(D2,      INPUT); // I2C SDA Open state to safe power
    pinMode(pinGrnd, OUTPUT);
    digitalWrite(pinGrnd, HIGH); 
+   
+   if (bme280.begin(0x77)) { // Default 0x77
+      portAddr = 0x77;
+   } else if (bme280.begin(0x76)) { // China 0x76
+      portAddr = 0x76;
+   }
 }
 
 /** 
@@ -72,7 +81,7 @@ bool MyBME280::begin()
   */
 bool MyBME280::readValues()
 {
-   if (secondsElapsedAndUpdate(myData.rtcData.lastBme280ReadSec, myOptions.bme280CheckIntervalSec)) {
+   if (secondsElapsedAndUpdate(myData.getActiveTimeSumSec(), myData.rtcData.lastBme280ReadSec, myOptions.bme280CheckIntervalSec)) {
       digitalWrite(pinGrnd, LOW);
       delay(100); // Short delay after power on
       if (!bme280.begin(portAddr)) {

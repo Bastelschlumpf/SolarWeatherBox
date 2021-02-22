@@ -31,8 +31,6 @@ protected:
    MyOptions &myOptions;        //!< Reference to global options
    MyData    &myData;           //!< Reference to global data
 
-   long       lowPowerStartSec; //!< Switch off timestamp
-
 public:
    MyVoltage(MyOptions &options, MyData &data);
 
@@ -47,7 +45,6 @@ public:
 MyVoltage::MyVoltage(MyOptions &options, MyData &data)
    : myOptions(options)
    , myData(data)
-   , lowPowerStartSec(0)
 {
 }
 
@@ -56,9 +53,7 @@ bool MyVoltage::begin()
 {
    MyDbg(F("MyVoltage::begin"));
    pinMode(A0, INPUT);
-   myData.voltage    = ANALOG_FACTOR * analogRead(A0); // Volt
-   myData.isLowPower = myData.voltage < myOptions.powerSaveModeVoltage;
-   lowPowerStartSec  = millis() / 1000;
+   readVoltage();
 }
 
 /** Reads the power supply voltage and save the value in the data class. 
@@ -66,6 +61,5 @@ bool MyVoltage::begin()
   */
 void MyVoltage::readVoltage()
 {
-   myData.voltage    = ANALOG_FACTOR * analogRead(A0); // Volt
-   myData.isLowPower = myData.voltage < myOptions.powerSaveModeVoltage; 
+   myData.voltage = ANALOG_FACTOR * analogRead(A0); // Volt
 }

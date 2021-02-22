@@ -493,8 +493,6 @@ void MyWebServer::handleLoadSettingsInfo()
 
          AddOption(info, F("isDeepSleepEnabled"), F("Power saving mode active"), myOptions->isDeepSleepEnabled, false);
       }
-      AddOption(info, F("powerSaveModeVoltage"),  F("Power saving mode below (Volt)"), String(myOptions->powerSaveModeVoltage, 2));
-      AddOption(info, F("powerCheckIntervalSec"), F("Check power every (Interval)"),   formatInterval(myOptions->powerCheckIntervalSec));
 
       AddOption(info, F("activeTimeSec"),    F("Active time (Interval)"),    formatInterval(myOptions->activeTimeSec));
       AddOption(info, F("deepSleepTimeSec"), F("DeepSleep time (Interval)"), formatInterval(myOptions->deepSleepTimeSec), false);
@@ -519,8 +517,6 @@ void MyWebServer::handleSaveSettings()
    GetOption(F("isDebugActive"),             myOptions->isDebugActive);
    GetOption(F("bme280CheckIntervalSec"),    myOptions->bme280CheckIntervalSec);
    GetOption(F("isDeepSleepEnabled"),        myOptions->isDeepSleepEnabled);
-   GetOption(F("powerSaveModeVoltage"),      myOptions->powerSaveModeVoltage);
-   GetOption(F("powerCheckIntervalSec"),     myOptions->powerCheckIntervalSec);
    GetOption(F("activeTimeSec"),             myOptions->activeTimeSec);
    GetOption(F("deepSleepTimeSec"),          myOptions->deepSleepTimeSec);
    GetOption(F("isMqttEnabled"),             myOptions->isMqttEnabled);

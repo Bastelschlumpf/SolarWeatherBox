@@ -56,7 +56,6 @@ public:
    String status;              //!< Status information
    String restartInfo;         //!< Information on restart
    bool   isOtaActive;         //!< Is OverTheAir update active?
-   bool   isLowPower;          //!< Is the power below min voltage?
    
    long   secondsToDeepSleep;  //!< Time until next deepsleep. -1 = disabled
    long   awakeTimeOffsetSec;  //!< Awake time offset for SaveSettings.
@@ -134,7 +133,6 @@ long MyData::RtcData::getCRC()
 /** Constructor */
 MyData::MyData()
    : isOtaActive(false)
-   , isLowPower(false)
    , secondsToDeepSleep(-1)
    , awakeTimeOffsetSec(0)
    , voltage(0.0)
