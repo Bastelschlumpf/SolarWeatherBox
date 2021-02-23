@@ -21,8 +21,7 @@
   */
 
 #define NO_DEEP_SLEEP_STARTUP_TIME 120     //!< No deep sleep for the first two minutes.
-// #define MAX_DEEP_SLEEP_TIME_SEC    60 * 60 //!< Maximum deep sleep time (1 hour)
-#define MAX_DEEP_SLEEP_TIME_SEC    60 // Test
+#define MAX_DEEP_SLEEP_TIME_SEC    60 * 60 //!< Maximum deep sleep time (1 hour)
 
 
 /**
