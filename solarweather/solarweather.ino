@@ -120,15 +120,17 @@ void setup()
 
    SPIFFS.begin();
    myOptions.load();
-   myVoltage.begin();
 
    // Back to deep sleep?
    myDeepSleep.begin();
-
-   // no deep sleep!
-   myWebServer.begin();
-   myMqtt.begin();
-   myBME280.begin();
+   if (myDeepSleep.haveToSleep()) {
+      myDeepSleep.sleep();
+   } else { // no deep sleep!
+      myVoltage.begin();
+      myWebServer.begin();
+      myMqtt.begin();
+      myBME280.begin();
+   }
 }
 
 /** Main loop function.
