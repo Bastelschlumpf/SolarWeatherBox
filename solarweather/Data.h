@@ -34,8 +34,9 @@ public:
    public:
       long activeTimeSumSec;       //!< Time on power with current millis..
       long deepSleepTimeSumSec;    //!< Time in deep sleep mode. 
-      long deepSleepStartSec;      //!< Timestamp of the last deep sleep start.
-                 
+
+      long deepSleepTimeRestSec;   //!< Overall time for this deep sleep.
+
       long lastBme280ReadSec;      //!< Timestamp of the last BME280 read.
       long lastMqttPublishSec;     //!< Timestamp from the last send.
 
@@ -92,7 +93,7 @@ public:
 MyData::RtcData::RtcData()
    : activeTimeSumSec(0)
    , deepSleepTimeSumSec(0)
-   , deepSleepStartSec(0)
+   , deepSleepTimeRestSec(0)
    , lastBme280ReadSec(0)
    , lastMqttPublishSec(0)
    , mqttConnErrorCount(0)
@@ -119,14 +120,14 @@ long MyData::RtcData::getCRC()
 {
    long crc = 0;
 
-   crc = crc32(crc, (unsigned char *) &activeTimeSumSec,    sizeof(long));
-   crc = crc32(crc, (unsigned char *) &deepSleepTimeSumSec, sizeof(long));
-   crc = crc32(crc, (unsigned char *) &deepSleepStartSec,   sizeof(long));
-   crc = crc32(crc, (unsigned char *) &lastBme280ReadSec,   sizeof(long));
-   crc = crc32(crc, (unsigned char *) &lastMqttPublishSec,  sizeof(long));
-   crc = crc32(crc, (unsigned char *) &mqttConnErrorCount,  sizeof(long));
-   crc = crc32(crc, (unsigned char *) &mqttSendCount,       sizeof(long));
-   crc = crc32(crc, (unsigned char *) &mqttConnErrorCount,  sizeof(long));
+   crc = crc32(crc, (unsigned char *) &activeTimeSumSec,     sizeof(long));
+   crc = crc32(crc, (unsigned char *) &deepSleepTimeSumSec,  sizeof(long));
+   crc = crc32(crc, (unsigned char *) &deepSleepTimeRestSec, sizeof(long));
+   crc = crc32(crc, (unsigned char *) &lastBme280ReadSec,    sizeof(long));
+   crc = crc32(crc, (unsigned char *) &lastMqttPublishSec,   sizeof(long));
+   crc = crc32(crc, (unsigned char *) &mqttConnErrorCount,   sizeof(long));
+   crc = crc32(crc, (unsigned char *) &mqttSendCount,        sizeof(long));
+   crc = crc32(crc, (unsigned char *) &mqttConnErrorCount,   sizeof(long));
    
    return crc;
 }

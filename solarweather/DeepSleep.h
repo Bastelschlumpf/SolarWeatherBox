@@ -20,7 +20,8 @@
   * DeepSleep functions.
   */
 
-#define NO_DEEP_SLEEP_STARTUP_TIME 120 //!< No deep sleep for the first two minutes.
+#define NO_DEEP_SLEEP_STARTUP_TIME 120     //!< No deep sleep for the first two minutes.
+#define MAX_DEEP_SLEEP_TIME_SEC    60 * 60 //!< Maximum deep sleep time (1 hour)
 
 
 /**
@@ -39,7 +40,7 @@ public:
    bool begin();
    
    bool haveToSleep();
-   void sleep(bool start = true);
+   void sleep();
 };
 
 /* ******************************************** */
@@ -75,30 +76,47 @@ bool MyDeepSleep::begin()
 /** Check if the configured time has elapsed and the voltage is too low then go into deep sleep. */
 bool MyDeepSleep::haveToSleep()
 {
-   long activeTimeSec = millis() / 1000 - myData.awakeTimeOffsetSec;
+   if (myData.rtcData.deepSleepTimeRestSec > 0) {
+      return true;
+   } else {
+      long activeTimeSec = millis() / 1000 - myData.awakeTimeOffsetSec;
 
-   myData.secondsToDeepSleep = -1;
-   if (myOptions.isDeepSleepEnabled) {
-      myData.secondsToDeepSleep = max(myOptions.activeTimeSec - activeTimeSec, NO_DEEP_SLEEP_STARTUP_TIME - myData.getActiveTimeSumSec());
+      myData.secondsToDeepSleep = -1;
+      if (myOptions.isDeepSleepEnabled) {
+         myData.secondsToDeepSleep = max(myOptions.activeTimeSec - activeTimeSec, NO_DEEP_SLEEP_STARTUP_TIME - myData.getActiveTimeSumSec());
+      }
+
+      return (myOptions.isDeepSleepEnabled &&
+              myData.getActiveTimeSumSec() > NO_DEEP_SLEEP_STARTUP_TIME &&
+              activeTimeSec                >= myOptions.activeTimeSec);
    }
-
-   return (myOptions.isDeepSleepEnabled && 
-           myData.getActiveTimeSumSec() > NO_DEEP_SLEEP_STARTUP_TIME &&
-           activeTimeSec                >= myOptions.activeTimeSec);
 }
 
-/** Entering the DeepSleep mode. Be sure we have connected the RST pin to the D0 pin for wakeup. */
-void MyDeepSleep::sleep(bool start /* = true */)
+/**
+  * Entering the DeepSleep mode. Be sure we have connected the RST pin to the D0 pin for wakeup.
+  * If the deep sleep mode time is above the maximum then we do it stepwise.
+  */
+void MyDeepSleep::sleep()
 {
-   MyDbg((String) F("Entering deep sleep for: ") + String(myOptions.deepSleepTimeSec) + F(" sec"));
+   long deepSleepTimeSec = myOptions.deepSleepTimeSec;
+
+   if (myData.rtcData.deepSleepTimeRestSec > 0) {
+      deepSleepTimeSec = myData.rtcData.deepSleepTimeRestSec;
+   }
+   if (deepSleepTimeSec >= MAX_DEEP_SLEEP_TIME_SEC) {
+      myData.rtcData.deepSleepTimeRestSec = deepSleepTimeSec - MAX_DEEP_SLEEP_TIME_SEC;
+      if (myData.rtcData.deepSleepTimeRestSec < 0) {
+         myData.rtcData.deepSleepTimeRestSec = 0;
+      }
+      deepSleepTimeSec = MAX_DEEP_SLEEP_TIME_SEC;
+   }
+
+   MyDbg((String) F("Entering deep sleep for: ") + String(deepSleepTimeSec) + F(" sec"));
    delay(1000);
 
-   if (start) {
-      myData.rtcData.deepSleepStartSec = myData.getActiveTimeSumSec();
-   }
    myData.rtcData.activeTimeSumSec    += myData.getActiveTimeSec();
-   myData.rtcData.deepSleepTimeSumSec += myOptions.deepSleepTimeSec;
+   myData.rtcData.deepSleepTimeSumSec += deepSleepTimeSec;
    myData.rtcData.setCRC();
    ESP.rtcUserMemoryWrite(0, (uint32_t *) &myData.rtcData, sizeof(MyData::RtcData));
-   ESP.deepSleep(myOptions.deepSleepTimeSec * 1000000);
+   ESP.deepSleep(deepSleepTimeSec * 1000000);
 }
