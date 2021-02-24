@@ -18,6 +18,8 @@
 
    ![Housing](housing/SolarWeatherBox.png "Housing")
 
+   ![Circuit](images/WebInterface.png "WebInterface")
+
    ![Circuit](circuit/Esp8266Sim808.png "Circuit")
 
 
