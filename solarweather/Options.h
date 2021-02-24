@@ -61,10 +61,10 @@ MyOptions::MyOptions()
    , wifiAP(WIFI_SID)
    , connectWifiAP(true)
    , wifiPassword(WIFI_PW)
-   , bme280CheckIntervalSec(60) // 1 minute
+   , bme280CheckIntervalSec(60) //  1 minute
    , isDeepSleepEnabled(false)
-   , activeTimeSec(60)          // 1 minute
-   , deepSleepTimeSec(3600)     // 1 hour
+   , activeTimeSec(60)          //  1 minute
+   , deepSleepTimeSec(3540)     // 59 minute
    , isMqttEnabled(false)
    , mqttName(MQTT_NAME)
    , mqttId(MQTT_ID)
