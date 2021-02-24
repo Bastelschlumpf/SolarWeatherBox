@@ -61,10 +61,10 @@ MyOptions::MyOptions()
    , wifiAP(WIFI_SID)
    , connectWifiAP(true)
    , wifiPassword(WIFI_PW)
-   , bme280CheckIntervalSec(60) // 1 Min
+   , bme280CheckIntervalSec(60) // 1 minute
    , isDeepSleepEnabled(false)
-   , activeTimeSec(60)          //  1 Min
-   , deepSleepTimeSec(900)      // 15 Min
+   , activeTimeSec(60)          // 1 minute
+   , deepSleepTimeSec(3600)     // 1 hour
    , isMqttEnabled(false)
    , mqttName(MQTT_NAME)
    , mqttId(MQTT_ID)
@@ -72,7 +72,7 @@ MyOptions::MyOptions()
    , mqttPort(MQTT_PORT)
    , mqttUser(MQTT_USER)
    , mqttPassword(MQTT_PASSWORD)
-   , mqttSendEverySec(900)      //  15 Min
+   , mqttSendEverySec(1800)     //  30 minute
 {
 }
 
@@ -101,7 +101,9 @@ bool MyOptions::load()
 
             value.replace("\r", "");
             value.replace("\n", "");
-            MyDbg((String) F("Load option '") + key + F("=") + value + F("'"));
+            if (isDebugActive) {
+               MyDbg((String) F("Load option '") + key + F("=") + value + F("'"));
+            }
 
             if (key == F("isDebugActive")) {
                isDebugActive = lValue;
