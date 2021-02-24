@@ -528,8 +528,6 @@ void MyWebServer::handleSaveSettings()
    GetOption(F("mqttPassword"),              myOptions->mqttPassword);
    GetOption(F("mqttSendEverySec"),          myOptions->mqttSendEverySec);
 
-   // Reset the rtc data if something has changed.
-   myData->awakeTimeOffsetSec = millis() / 1000;
    // Reset the last mqtt time so the mqtt is not direct starting afer save settings.
    myData->rtcData.lastMqttPublishSec = myData->getActiveTimeSec();
    myOptions->save();
