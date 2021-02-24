@@ -21,7 +21,7 @@
   */
 
 #define NO_DEEP_SLEEP_STARTUP_TIME 120     //!< No deep sleep for the first two minutes.
-#define MAX_DEEP_SLEEP_TIME_SEC    60 * 60 //!< Maximum deep sleep time (1 hour)
+#define MAX_DEEP_SLEEP_TIME_SEC    30 * 60 //!< Maximum deep sleep time (30 minutes)
 
 
 /**
@@ -79,7 +79,7 @@ bool MyDeepSleep::haveToSleep()
    if (myData.rtcData.deepSleepTimeRestSec > 0) {
       return true;
    } else {
-      long activeTimeSec = millis() / 1000 - myData.awakeTimeOffsetSec;
+      long activeTimeSec = myData.getActiveTimeSec();
 
       myData.secondsToDeepSleep = -1;
       if (myOptions.isDeepSleepEnabled) {
@@ -121,5 +121,5 @@ void MyDeepSleep::sleep()
    myData.rtcData.deepSleepTimeSumSec += deepSleepTimeSec;
    myData.rtcData.setCRC();
    ESP.rtcUserMemoryWrite(0, (uint32_t *) &myData.rtcData, sizeof(MyData::RtcData));
-   ESP.deepSleep(deepSleepTimeSec * 1000000);
+   ESP.deepSleep(deepSleepTimeSec * 1000000ULL);
 }
