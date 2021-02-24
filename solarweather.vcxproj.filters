@@ -26,6 +26,7 @@
     <None Include="solarweather\data\Update.html">
       <Filter>data</Filter>
     </None>
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="solarweather\BME280.h" />

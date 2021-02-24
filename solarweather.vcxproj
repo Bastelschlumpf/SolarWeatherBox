@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <None Include="README.md" />
     <None Include="solarweather\.gitignore" />
     <None Include="solarweather\data\Console.html" />
     <None Include="solarweather\data\Infos.html" />
