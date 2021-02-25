@@ -59,6 +59,7 @@ public:
    bool   isOtaActive;         //!< Is OverTheAir update active?
    
    long   secondsToDeepSleep;  //!< Time until next deepsleep. -1 = disabled
+   long   awakeTimeOffsetSec;  //!< Awake time offset for SaveSettings.
 
    double voltage;             //!< Current supply voltage
    double temperature;         //!< Current BME280 temperature
@@ -135,6 +136,7 @@ long MyData::RtcData::getCRC()
 MyData::MyData()
    : isOtaActive(false)
    , secondsToDeepSleep(-1)
+   , awakeTimeOffsetSec(0)
    , voltage(0.0)
    , temperature(0.0)
    , humidity(0.0)

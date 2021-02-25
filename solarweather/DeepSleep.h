@@ -21,8 +21,8 @@
   */
 
 #define NO_DEEP_SLEEP_STARTUP_TIME 120     //!< No deep sleep for the first two minutes.
-#define MAX_DEEP_SLEEP_TIME_SEC    30 * 60 //!< Maximum deep sleep time (30 minutes)
-#define DEEP_SLEEP_CORRECT         1.1     //!< Correction try for the deep sleep inaccuracy
+#define MAX_DEEP_SLEEP_TIME_SEC    60 * 60 //!< Maximum deep sleep time (60 minutes)
+#define DEEP_SLEEP_CORRECT         1.09    //!< Correction try for the deep sleep inaccuracy
 
 
 /**
@@ -80,7 +80,9 @@ void MyDeepSleep::updateTimeToSleep()
 {
    myData.secondsToDeepSleep = -1;
    if (myOptions.isDeepSleepEnabled) {
-      myData.secondsToDeepSleep = max(myOptions.activeTimeSec - myData.getActiveTimeSec(), NO_DEEP_SLEEP_STARTUP_TIME - myData.getActiveTimeSumSec());
+      long activeTimeSec = myData.getActiveTimeSec() - myData.awakeTimeOffsetSec;
+      
+      myData.secondsToDeepSleep = max(myOptions.activeTimeSec - activeTimeSec, NO_DEEP_SLEEP_STARTUP_TIME - myData.getActiveTimeSumSec());
    }
 }
 
@@ -90,9 +92,11 @@ bool MyDeepSleep::haveToSleep()
    if (myData.rtcData.deepSleepTimeRestSec > 0) {
       return true;
    } else {
+      long activeTimeSec = myData.getActiveTimeSec() - myData.awakeTimeOffsetSec;
+       
       return (myOptions.isDeepSleepEnabled &&
               myData.getActiveTimeSumSec() > NO_DEEP_SLEEP_STARTUP_TIME &&
-              myData.getActiveTimeSec()    >= myOptions.activeTimeSec);
+              activeTimeSec                >= myOptions.activeTimeSec);
    }
 }
 
