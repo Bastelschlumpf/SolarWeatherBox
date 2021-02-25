@@ -142,6 +142,7 @@ void loop()
 {
    myVoltage.readVoltage();
    myBME280.readValues();
+   myDeepSleep.updateTimeToSleep();
 
    myWebServer.handleClient();
    

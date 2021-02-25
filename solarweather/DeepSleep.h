@@ -22,6 +22,7 @@
 
 #define NO_DEEP_SLEEP_STARTUP_TIME 120     //!< No deep sleep for the first two minutes.
 #define MAX_DEEP_SLEEP_TIME_SEC    30 * 60 //!< Maximum deep sleep time (30 minutes)
+#define DEEP_SLEEP_CORRECT         1.1     //!< Correction try for the deep sleep inaccuracy
 
 
 /**
@@ -40,6 +41,7 @@ public:
    bool begin();
    
    bool haveToSleep();
+   void updateTimeToSleep();
    void sleep();
 };
 
@@ -73,22 +75,24 @@ bool MyDeepSleep::begin()
    return true;
 }
 
+/** Calculate the time needed for the next deep sleep. */
+void MyDeepSleep::updateTimeToSleep()
+{
+   myData.secondsToDeepSleep = -1;
+   if (myOptions.isDeepSleepEnabled) {
+      myData.secondsToDeepSleep = max(myOptions.activeTimeSec - myData.getActiveTimeSec(), NO_DEEP_SLEEP_STARTUP_TIME - myData.getActiveTimeSumSec());
+   }
+}
+
 /** Check if the configured time has elapsed and the voltage is too low then go into deep sleep. */
 bool MyDeepSleep::haveToSleep()
 {
    if (myData.rtcData.deepSleepTimeRestSec > 0) {
       return true;
    } else {
-      long activeTimeSec = myData.getActiveTimeSec();
-
-      myData.secondsToDeepSleep = -1;
-      if (myOptions.isDeepSleepEnabled) {
-         myData.secondsToDeepSleep = max(myOptions.activeTimeSec - activeTimeSec, NO_DEEP_SLEEP_STARTUP_TIME - myData.getActiveTimeSumSec());
-      }
-
       return (myOptions.isDeepSleepEnabled &&
               myData.getActiveTimeSumSec() > NO_DEEP_SLEEP_STARTUP_TIME &&
-              activeTimeSec                >= myOptions.activeTimeSec);
+              myData.getActiveTimeSec()    >= myOptions.activeTimeSec);
    }
 }
 
@@ -121,5 +125,5 @@ void MyDeepSleep::sleep()
    myData.rtcData.deepSleepTimeSumSec += deepSleepTimeSec;
    myData.rtcData.setCRC();
    ESP.rtcUserMemoryWrite(0, (uint32_t *) &myData.rtcData, sizeof(MyData::RtcData));
-   ESP.deepSleep(deepSleepTimeSec * 1000000ULL);
+   ESP.deepSleep(deepSleepTimeSec * DEEP_SLEEP_CORRECT * 1000000ULL);
 }

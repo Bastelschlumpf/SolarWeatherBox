@@ -120,7 +120,10 @@ bool MyMqtt::waitingForMqtt()
    if (publishInProgress) {
       return true;
    }
-   return secondsElapsed(myData.getAllTimeSumSec(), myData.rtcData.lastMqttPublishSec, myOptions.mqttSendEverySec);
+   if (myOptions.isMqttEnabled) {
+      return secondsElapsed(myData.getAllTimeSumSec(), myData.rtcData.lastMqttPublishSec, myOptions.mqttSendEverySec);
+   }
+   return false;
 }
 
 /** Sets the MQTT server settings */

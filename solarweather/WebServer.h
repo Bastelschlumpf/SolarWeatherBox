@@ -223,7 +223,13 @@ bool MyWebServer::GetOption(String id, String &option)
 {
    if (server.hasArg(id)) {
       option = server.arg(id);
+      if (myOptions->isDebugActive) {
+         MyDbg((String) "GetOption[" + id + "]: " + option);
+      }
       return true;
+   }
+   if (myOptions->isDebugActive) {
+      MyDbg((String) "GetOption[" + id + "]: fail");
    }
    return false;
 }
@@ -234,6 +240,9 @@ bool MyWebServer::GetOption(String id, long &option)
    bool   ret = false;
    String opt = server.arg(id);
 
+   if (myOptions->isDebugActive) {
+      MyDbg((String) "GetOption[" + id + "]: " + opt);
+   }
    if (opt != "") {
       if (opt.indexOf(F(":")) != -1) {
          ret = scanInterval(opt, option);
@@ -251,6 +260,9 @@ bool MyWebServer::GetOption(String id, double &option)
    String opt = server.arg(id);
 
    if (opt != "") {
+      if (myOptions->isDebugActive) {
+         MyDbg((String) "GetOption[" + id + "]: " + option);
+      }
       option = atof(opt.c_str());
       return true;
    }
@@ -264,6 +276,9 @@ bool MyWebServer::GetOption(String id, bool &option)
 
    option = false;
    if (opt != "") {
+      if (myOptions->isDebugActive) {
+         MyDbg((String) "GetOption[" + id + "]: " + opt);
+      }
       if (opt == F("on")) {
          option = true;
       }
@@ -516,9 +531,6 @@ void MyWebServer::handleSaveSettings()
    GetOption(F("wifiPassword"),              myOptions->wifiPassword);
    GetOption(F("isDebugActive"),             myOptions->isDebugActive);
    GetOption(F("bme280CheckIntervalSec"),    myOptions->bme280CheckIntervalSec);
-   GetOption(F("isDeepSleepEnabled"),        myOptions->isDeepSleepEnabled);
-   GetOption(F("activeTimeSec"),             myOptions->activeTimeSec);
-   GetOption(F("deepSleepTimeSec"),          myOptions->deepSleepTimeSec);
    GetOption(F("isMqttEnabled"),             myOptions->isMqttEnabled);
    GetOption(F("mqttName"),                  myOptions->mqttName);
    GetOption(F("mqttId"),                    myOptions->mqttId);
@@ -527,6 +539,9 @@ void MyWebServer::handleSaveSettings()
    GetOption(F("mqttUser"),                  myOptions->mqttUser);
    GetOption(F("mqttPassword"),              myOptions->mqttPassword);
    GetOption(F("mqttSendEverySec"),          myOptions->mqttSendEverySec);
+   GetOption(F("isDeepSleepEnabled"),        myOptions->isDeepSleepEnabled);
+   GetOption(F("activeTimeSec"),             myOptions->activeTimeSec);
+   GetOption(F("deepSleepTimeSec"),          myOptions->deepSleepTimeSec);
 
    // Reset the last mqtt time so the mqtt is not direct starting afer save settings.
    myData->rtcData.lastMqttPublishSec = myData->getActiveTimeSec();

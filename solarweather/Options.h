@@ -35,9 +35,6 @@ public:
    String wifiPassword;              //!< WiFi AP password.
    bool   isDebugActive;             //!< Is detailed debugging enabled?
    long   bme280CheckIntervalSec;    //!< Time interval to read the temp, hum and pressure.
-   bool   isDeepSleepEnabled;        //!< Should the system go into deepsleep if needed.
-   long   activeTimeSec;             //!< Maximum alive time after deepsleep.
-   long   deepSleepTimeSec;          //!< Time to stay in deep sleep (without check interrupts)
    bool   isMqttEnabled;             //!< Should the system connect to a MQTT server?
    String mqttName;                  //!< MQTT server name.
    String mqttId;                    //!< MQTT ID.
@@ -46,6 +43,9 @@ public:
    String mqttUser;                  //!< MQTT user.
    String mqttPassword;              //!< MQTT password.
    long   mqttSendEverySec;          //!< Send data interval to MQTT server.
+   bool   isDeepSleepEnabled;        //!< Should the system go into deepsleep if needed.
+   long   activeTimeSec;             //!< Maximum alive time after deepsleep.
+   long   deepSleepTimeSec;          //!< Time to stay in deep sleep (without check interrupts)
 
 public:
    MyOptions();
@@ -62,9 +62,6 @@ MyOptions::MyOptions()
    , connectWifiAP(true)
    , wifiPassword(WIFI_PW)
    , bme280CheckIntervalSec(60) //  1 minute
-   , isDeepSleepEnabled(false)
-   , activeTimeSec(60)          //  1 minute
-   , deepSleepTimeSec(3540)     // 59 minute
    , isMqttEnabled(false)
    , mqttName(MQTT_NAME)
    , mqttId(MQTT_ID)
@@ -73,6 +70,9 @@ MyOptions::MyOptions()
    , mqttUser(MQTT_USER)
    , mqttPassword(MQTT_PASSWORD)
    , mqttSendEverySec(1800)     //  30 minute
+   , isDeepSleepEnabled(false)
+   , activeTimeSec(60)          //  1 minute
+   , deepSleepTimeSec(3600)     // 59 minute
 {
 }
 
@@ -115,12 +115,6 @@ bool MyOptions::load()
                wifiPassword = value;
             } else if (key == F("bme280CheckIntervalSec")) {
                bme280CheckIntervalSec = lValue;
-            } else if (key == F("isDeepSleepEnabled")) {
-               isDeepSleepEnabled = lValue;
-            } else if (key == F("activeTimeSec")) {
-               activeTimeSec = lValue;
-            } else if (key == F("deepSleepTimeSec")) {
-               deepSleepTimeSec = lValue;
             } else if (key == F("isMqttEnabled")) {
                isMqttEnabled = lValue;
             } else if (key == F("mqttName")) {
@@ -137,6 +131,12 @@ bool MyOptions::load()
                mqttPassword = value;
             } else if (key == F("mqttSendEverySec")) {
                mqttSendEverySec = lValue;
+            } else if (key == F("isDeepSleepEnabled")) {
+               isDeepSleepEnabled = lValue;
+            } else if (key == F("activeTimeSec")) {
+               activeTimeSec = lValue;
+            } else if (key == F("deepSleepTimeSec")) {
+               deepSleepTimeSec = lValue;
             } else {
                MyDbg((String) F("Wrong option entry: ") + line);
                ret = false;
@@ -164,9 +164,6 @@ bool MyOptions::save()
      file.println((String) F("wifiAP=")                 + wifiAP);
      file.println((String) F("wifiPassword=")           + wifiPassword);
      file.println((String) F("bme280CheckIntervalSec=") + String(bme280CheckIntervalSec));
-     file.println((String) F("isDeepSleepEnabled=")     + String(isDeepSleepEnabled));
-     file.println((String) F("activeTimeSec=")          + String(activeTimeSec));
-     file.println((String) F("deepSleepTimeSec=")       + String(deepSleepTimeSec));
      file.println((String) F("isMqttEnabled=")          + String(isMqttEnabled));
      file.println((String) F("mqttName=")               + mqttName);
      file.println((String) F("mqttId=")                 + mqttId);
@@ -175,6 +172,9 @@ bool MyOptions::save()
      file.println((String) F("mqttUser=")               + mqttUser);
      file.println((String) F("mqttPassword=")           + mqttPassword);
      file.println((String) F("mqttSendEverySec=")       + String(mqttSendEverySec));
+     file.println((String) F("isDeepSleepEnabled=")     + String(isDeepSleepEnabled));
+     file.println((String) F("activeTimeSec=")          + String(activeTimeSec));
+     file.println((String) F("deepSleepTimeSec=")       + String(deepSleepTimeSec));
      file.close();
      MyDbg(F("Settings saved"));
      return true;
