@@ -132,6 +132,8 @@ bool MyWebServer::begin()
    WiFi.mode(WIFI_AP_STA);
    WiFi.softAP(SOFT_AP_NAME, SOFT_AP_PW);
    WiFi.softAPConfig(ip, ip, IPAddress(255, 255, 255, 0));  
+   WiFi.forceSleepWake();
+   
    dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
    dnsServer.start(53, F("*"), ip);
    myData->softAPIP         = WiFi.softAPIP().toString();

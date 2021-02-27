@@ -122,12 +122,17 @@ void MyDeepSleep::sleep()
       deepSleepTimeSec = MAX_DEEP_SLEEP_TIME_SEC;
    }
 
-   MyDbg((String) F("Entering deep sleep for: ") + String(deepSleepTimeSec) + F(" sec"));
-   delay(1000);
-
    myData.rtcData.activeTimeSumSec    += myData.getActiveTimeSec();
    myData.rtcData.deepSleepTimeSumSec += deepSleepTimeSec;
    myData.rtcData.setCRC();
    ESP.rtcUserMemoryWrite(0, (uint32_t *) &myData.rtcData, sizeof(MyData::RtcData));
+
+   WiFi.disconnect();
+   WiFi.mode(WIFI_OFF);
+   WiFi.forceSleepBegin();
+   yield();
+   
+   MyDbg((String) F("Entering deep sleep for: ") + String(deepSleepTimeSec) + F(" sec"));
+   delay(1000);
    ESP.deepSleep(deepSleepTimeSec * DEEP_SLEEP_CORRECT * 1000000ULL);
 }

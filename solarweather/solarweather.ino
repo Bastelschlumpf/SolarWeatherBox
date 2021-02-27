@@ -156,9 +156,6 @@ void loop()
 
    if (!myMqtt.waitingForMqtt()) {
       if (myDeepSleep.haveToSleep()) {
-         WiFi.disconnect();
-         WiFi.mode(WIFI_OFF);
-         yield();
          myDeepSleep.sleep();
       }
    }
