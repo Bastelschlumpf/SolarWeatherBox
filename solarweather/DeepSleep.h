@@ -134,5 +134,5 @@ void MyDeepSleep::sleep()
    
    MyDbg((String) F("Entering deep sleep for: ") + String(deepSleepTimeSec) + F(" sec"));
    delay(1000);
-   ESP.deepSleep(deepSleepTimeSec * DEEP_SLEEP_CORRECT * 1000000ULL);
+   ESP.deepSleep(deepSleepTimeSec * DEEP_SLEEP_CORRECT * 1000000ULL, WAKE_RF_DEFAULT);
 }

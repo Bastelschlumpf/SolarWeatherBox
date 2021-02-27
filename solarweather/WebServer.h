@@ -128,11 +128,12 @@ bool MyWebServer::begin()
    }
 
    MyDbg(F("MyWebServer::begin"));
-   WiFi.persistent(false);
+   WiFi.forceSleepWake();
+   WiFi.mode(WIFI_OFF); // workaround connection problem after deep sleep
+   delay(100);
    WiFi.mode(WIFI_AP_STA);
    WiFi.softAP(SOFT_AP_NAME, SOFT_AP_PW);
    WiFi.softAPConfig(ip, ip, IPAddress(255, 255, 255, 0));  
-   WiFi.forceSleepWake();
    
    dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
    dnsServer.start(53, F("*"), ip);
